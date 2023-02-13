@@ -1,0 +1,47 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const App = () => {
+  const [nfts, setNfts] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get("/api/nfts")
+      .then(res => {
+        setNfts(res.data);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, []);
+
+  return (
+    <div className="App">
+      <h1>Multi-Chain NFT Portfolio</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Metadata</th>
+            <th>Transaction History</th>
+            <th>Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {nfts.map(nft => (
+            <tr key={nft.id}>
+              <td>
+                <img src={nft.image} alt={nft.metadata} />
+              </td>
+              <td>{nft.metadata}</td>
+              <td>{nft.transactionHistory}</td>
+              <td>{nft.price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default App;
