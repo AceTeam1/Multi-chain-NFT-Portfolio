@@ -1,0 +1,69 @@
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+
+const App = () => {
+  const [nfts, setNfts] = useState([]);
+  const [sortBy, setSortBy] = useState("price");
+
+  useEffect(() => {
+    axios
+      .get("/api/nfts")
+      .then(res => {
+        setNfts(res.data);
+      })
+      .catch(err => {
+        console.error(err);
+      });
+  }, []);
+
+  const handleSort = sortValue => {
+    setSortBy(sortValue);
+  };
+
+  const sortedNfts = [...nfts].sort((a, b) => {
+    if (sortBy === "price") {
+      return a.price - b.price;
+    } else if (sortBy === "metadata") {
+      return a.metadata.localeCompare(b.metadata);
+    } else {
+      return a.transactionHistory.localeCompare(b.transactionHistory);
+    }
+  });
+
+  return (
+    <div className="App">
+      <h1>Multi-Chain NFT Portfolio</h1>
+      <div className="sort-options">
+        <button onClick={() => handleSort("price")}>Sort by Price</button>
+        <button onClick={() => handleSort("metadata")}>Sort by Metadata</button>
+        <button onClick={() => handleSort("transactionHistory")}>
+          Sort by Transaction History
+        </button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Image</th>
+            <th>Metadata</th>
+            <th>Transaction History</th>
+            <th>Price (USD)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sortedNfts.map(nft => (
+            <tr key={nft.id}>
+              <td>
+                <img src={nft.image} alt={nft.metadata} />
+              </td>
+              <td>{nft.metadata}</td>
+              <td>{nft.transactionHistory}</td>
+              <td>{nft.price}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export default App;
